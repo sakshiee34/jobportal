@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const userschema = new mongoose.Schema({
     profilepic: { type: String },
@@ -7,19 +7,19 @@ const userschema = new mongoose.Schema({
     password: { type: String, required: true },
     phoneNumber: { type: Number },
     resume: { type: String },
-    higherdegree: { type: String },
+    highestdegree: { type: String },
     skills: [],
     experience: { type: String },
     currentcompany: { type: String },
     currentrole: { type: String },
+    currentlocation: { type: String },
     noticeperiod: { type: Number },
     prefferedlocation: { type: String },
-    currentlocation: { type: String },
     currentctc: { type: Number },
     expectedctc: { type: Number },
     isadmin: { type: Boolean, default: false },
-    createAt: { type: Date, default: Date.now },
-    updateteAt: { type: Date, default: Date.now },
+    createdAt: { type: Date, default: Date.now },
+    updatedAt: { type: Date, default: Date.now }
 })
 
 const usermodel = mongoose.model("users", userschema);
