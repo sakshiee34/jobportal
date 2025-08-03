@@ -1,7 +1,13 @@
 import mongoose from "mongoose";
 import jobmodel from "../models/jobsmodel.js";
 import usermodel from "../models/usermodel.js";
-
+import {
+    fetchJobsFromAPI,
+    processJobWithAI,
+    saveJobToDB,
+    fetchProcessAndStoreJobs
+} from '../services/services.js';
+import { generateFromansgemini } from "../services/geminiClient.js";
 export const postjob = async(req, res) => {
     try {
         const adminid = req.params.adminid;
@@ -117,6 +123,48 @@ export const deletejob = async(req, res) => {
         }
         let daletedjob = await jobmodel.findByIdAndDelete(jobid); //old data not exist means null
         return res.status(200).json({ message: "job deleted successfully", job: daletedjob })
+    } catch (error) {
+        return res.status(500).json({ error: 'internal server error' + error.message });
+    }
+}
+
+
+// In your controller
+export const importJobs = async(req, res) => {
+    try {
+        const results = await fetchProcessAndStoreJobs('6889ee4896956f2ca0c9a512');
+
+        if (results.every(r => !r.success)) {
+            return res.status(400).json({
+                success: false,
+                message: 'All jobs failed to process',
+                results
+            });
+        }
+
+        res.json({
+            success: true,
+            results
+        });
+    } catch (error) {
+        console.error('Import jobs error:', error);
+        res.status(500).json({
+            success: false,
+            error: error.message || 'Job import failed'
+        });
+    }
+};
+
+
+export const askquestion = async(req, res) => {
+    try {
+        let que = req.body.question;
+        let data = req.body.data;
+        let prompt = `I want to ask you a question. The question is: ${que}. you should ans from my data ${data}`;
+        let ans = await generateFromansgemini(prompt);
+        console.log(ans);
+
+        return res.status(200).json({ message: "question asked successfully", answer: ans })
     } catch (error) {
         return res.status(500).json({ error: 'internal server error' + error.message });
     }

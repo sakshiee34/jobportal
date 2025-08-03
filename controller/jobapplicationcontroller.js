@@ -23,30 +23,34 @@ export const applyjob = async(req, res) => {
         if (!job) {
             return res.status(404).json({ error: "jobid in valid" })
         }
+
         //sending mail
         try {
             let transporter = nodemailer.createTransport({
                 service: 'gmail',
                 auth: {
-                    user: 'sakshi.mali@klebcaathani.com ',
-                    pass: 'usue lahr kexe soeo'
+                    user: 'yeddulajagadeesh11@gmail.com',
+                    pass: 'ztpk mfgf vkfq zpfy'
                 }
             })
+
             let mailinfo = {
-                from: 'sakshi.mali@klebcaathani.com ',
-                to: 'shubhadagholap408@gmail.com',
+                from: 'yeddulajagadeesh11@gmail.com',
+                to: user.email,
                 subject: `job applied ${job.title}`,
                 html: `
                 <h1 style="color:yellow">${job.title}</h1>
                 <p>${job.description}</p>
                 <p>location:${job.location}</p>
-                <p>apply link:${job.applylink}</p>
+                <p>apply link:${job.applyLink}</p>basa
                 `
             }
-            await transporter.sendMail(mailinfo)
+
+            await transporter.sendMail(mailinfo);
         } catch (error) {
-            return res.status(500).json({ error: 'internal server error' + error.message });
+            return res.status(500).json({ error: 'internal server error failed to sent mail' + error.message });
         }
+
         const newappliction = new jobsapplicationmodel({...req.body, jobid: jobid, userid: userid });
         await newappliction.save();
         return res.status(200).json({ message: "job applied successfully", application: newappliction });
@@ -73,6 +77,7 @@ export const getapplicationsoflogineduser = async(req, res) => {
         return res.status(500).json({ error: 'internal server error' + error.message });
     }
 }
+
 export const getapplicationofparticularjob = async(req, res) => {
     try {
         let jobid = req.params.jobid;
@@ -89,34 +94,32 @@ export const getapplicationofparticularjob = async(req, res) => {
         return res.status(500).json({ error: 'internal server error' + error.message });
     }
 }
+
 export const updateapplication = async(req, res) => {
-    try {
-        let id = req.params.id;
-        if (!id) {
-            return res.status(400).json({ error: 'id is required' });
-        }
-        let updateapplication = await jobsapplicationmodel.findByIdAndUpdate(id, req.body); //old data not exist means null
-        if (!updateapplication) {
-            return res.status(404).json({ error: "application  not found updated failed" })
-        }
-        return res.status(200).json({ message: "application updated successfully", application: updateapplication })
-    } catch (error) {
-        return res.status(500).json({ error: "internal server error" + error })
-    }
-}
-export const deleteapplication = async(req, res) => {
     try {
         const id = req.params.id;
         if (!id) {
-            return res.status(400).json({ error: 'id is required' });
+            return res.status(400).json({ error: "id is required" })
         }
-        let deleteapplication = await jobsapplicationmodel.findByIdAndDelete(id);
-        if (!deleteapplication) {
-            return res.status(404).json({ error: "application not found deleted failed" })
-        }
-
-        return res.status(200).json({ message: "application deleted successfully", application: deleteapplication })
+        const updateapplication = await jobsapplicationmodel.findByIdAndUpdate(id, req.body);
+        return res.status(200).json({ message: "application updated successfully", application: updateapplication })
     } catch (error) {
-        return res.status(500).json({ error: "internal server error" + error })
+        return res.status(500).json({ error: 'internal server error' + error.message });
+    }
+}
+
+export const deleteapplication = async(req, res) => {
+    try {
+        let id = req.params.id;
+        if (!id) {
+            return res.status(400).json({ error: "id is required" })
+        }
+        let deletedapplication = await jobsapplicationmodel.findByIdAndDelete(id);
+        if (!deletedapplication) {
+            return res.status(404).json({ error: "application not found" })
+        }
+        return res.status(200).json({ message: "application deleted successfully", application: deletedapplication })
+    } catch (error) {
+        return res.status(500).json({ error: 'internal server error' + error.message });
     }
 }

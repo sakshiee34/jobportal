@@ -1,7 +1,7 @@
 // utils/geminiClient.js
 import axios from 'axios';
 
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "AIzaSyAfnG83Zmz1tC-cHMn_3gp5BM2z6kvVddY";
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "";
 // utils/geminiClient.js
 
 // Updated API URL with correct model name
@@ -19,6 +19,25 @@ export const generateFromGemini = async(prompt) => {
         const response = await axios.post(GEMINI_API_URL, requestBody);
         const generatedText = response.data.candidates ? .[0] ? .content ? .parts ? .[0] ? .text || '';
         return generatedText;
+    } catch (error) {
+        console.error('Gemini API error:', error.response ? .data || error.message);
+        throw new Error('Failed to generate content from Gemini API');
+    }
+};
+
+export const generateFromansgemini = async(prompt) => {
+    const requestBody = {
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: {
+            response_mime_type: "text/plain" // Request JSON response
+        }
+    };
+
+    try {
+        const response = await axios.post(GEMINI_API_URL, requestBody);
+        console.log(response.data.candidates ? .[0] ? .content.parts[0] ? .text);
+
+        return response.data.candidates ? .[0] ? .content.parts[0] ? .text || 'nothing';
     } catch (error) {
         console.error('Gemini API error:', error.response ? .data || error.message);
         throw new Error('Failed to generate content from Gemini API');
